@@ -1,0 +1,29 @@
+{
+  "name": "ustozlar-1-oktabr",
+  "version": "1.0.0",
+  "private": true,
+  "description": "1-oktabr — O‘qituvchi va murabbiylar kuni tabrik animatsiyasi (Remotion + React + SVG)",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "audio": "python3 audio/build_audio.py",
+    "render:1": "remotion render src/index.ts Ustozlar out/01_ustozlar_0-30.mp4 --frames=0-899",
+    "render:2": "remotion render src/index.ts Ustozlar out/02_ustozlar_30-60.mp4 --frames=900-1799",
+    "concat": "bash scripts/concat.sh",
+    "build": "npm run audio && npm run render:1 && npm run render:2 && npm run concat && npm run verify",
+    "verify": "python3 scripts/verify.py"
+  },
+  "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/montserrat": "^5.3.0",
+    "@remotion/cli": "^4.0.529",
+    "@remotion/fonts": "^4.0.529",
+    "@remotion/paths": "^4.0.529",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.529"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2"
+  }
+}

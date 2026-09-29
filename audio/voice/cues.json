@@ -1,0 +1,14 @@
+{
+  "note": "Diktor iboralari uchun vaqt belgilari (soniya, umumiy 60 s vaqt chizig'ida). Fayllarni shu papkaga 48 kHz WAV qilib qo'ying va 'npm run audio' ni ishga tushiring. 4-ibora 29.4 s dan oldin tugashi, 5-ibora 30.5 s dan keyin boshlanishi shart — gap 30-soniyadagi bo'linishda kesilmaydi.",
+  "cues": [
+    {"file": "v01.wav", "start": 1.2, "must_end_before": 4.4, "text": "Aziz ustozlar, qadrli murabbiylar!"},
+    {"file": "v02.wav", "start": 4.7, "must_end_before": 11.8, "text": "Sizlarni birinchi oktabr — O‘qituvchi va murabbiylar kuni bilan chin qalbimdan tabriklayman."},
+    {"file": "v03.wav", "start": 12.1, "must_end_before": 19.1, "text": "Har bir sabog‘ingiz, mehringiz va sabringiz ortida yosh avlodning yorug‘ kelajagi mujassam."},
+    {"file": "v04.wav", "start": 19.5, "must_end_before": 29.4, "text": "Farzandlarimiz qalbida ilmga ishtiyoq, hayotga ishonch uyg‘otayotganingiz uchun sizlarga chuqur minnatdorlik bildiraman."},
+    {"file": "v05.wav", "start": 30.8, "must_end_before": 36.2, "text": "Siz yoqqan ilm nuri avlodlar yo‘lini yoritadi."},
+    {"file": "v06.wav", "start": 36.6, "must_end_before": 44.7, "text": "Barchangizga mustahkam sog‘lik, oilaviy baxt, qalb xotirjamligi va sharafli mehnatingizda ulkan muvaffaqiyatlar tilayman."},
+    {"file": "v07.wav", "start": 45.0, "must_end_before": 49.3, "text": "Shogirdlaringizning yutuqlari doimo sizga quvonch va faxr olib kelsin."},
+    {"file": "v08.wav", "start": 49.6, "must_end_before": 53.0, "text": "Bayramingiz muborak, aziz ustozlar!"},
+    {"file": "v09.wav", "start": 53.4, "must_end_before": 58.8, "text": "Hurmat bilan, Qo‘qon shahar yigirma uchinchi maktab maslahatchisi Murodov Jasurbek."}
+  ]
+}

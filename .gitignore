@@ -1,0 +1,6 @@
+node_modules/
+build/
+.remotion/
+out/*.png
+out/frames/
+*.log
