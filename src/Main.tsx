@@ -55,7 +55,9 @@ const Celebration: React.FC<{t: number}> = ({t}) => {
   return <g opacity={intensity}>{out}</g>;
 };
 
-export const Main: React.FC = () => {
+export type MainProps = {photo: string | null};
+
+export const Main: React.FC<MainProps> = ({photo}) => {
   const frame = useCurrentFrame();
   const t = frame / FPS; // global vaqt — qism bo‘yicha qayta boshlanmaydi
   const cam = camera(t);
@@ -100,7 +102,7 @@ export const Main: React.FC = () => {
         <Celebration t={t} />
       </svg>
       <AbsoluteFill>
-        <Texts t={t} cam={cam} />
+        <Texts t={t} cam={cam} photo={photo} />
       </AbsoluteFill>
       <svg width={WIDTH} height={HEIGHT} style={{position: 'absolute', inset: 0, pointerEvents: 'none'}}>
         <BokehParticles t={t} cam={cam} intensity={ramp(t, 1, 4)} />

@@ -2,6 +2,7 @@ import React from 'react';
 import {SANS, SERIF} from '../lib/fonts';
 import {Cam, clamp01, easeOut, lerp, ramp, smoother, worldToScreen} from '../lib/timeline';
 import {INTRO_LINE_Y} from './Light';
+import {Portrait} from './Portrait';
 
 // Barcha ekrandagi matnlar (o‘zbek lotin alifbosi, ‘ = U+2018).
 export const TEXT = {
@@ -130,7 +131,7 @@ const FromLine: React.FC<{
   );
 };
 
-export const Texts: React.FC<{t: number; cam: Cam}> = ({t, cam}) => {
+export const Texts: React.FC<{t: number; cam: Cam; photo?: string | null}> = ({t, cam, photo}) => {
   const els: React.ReactNode[] = [];
 
   // 00:00–00:06 — sana va bayram nomi (kamera bilan birga yengil yaqinlashadi)
@@ -271,7 +272,29 @@ export const Texts: React.FC<{t: number; cam: Cam}> = ({t, cam}) => {
   }
 
   // 00:53–01:00 — imzo (kamida 5 soniya to‘liq ko‘rinadi)
-  if (t > 52.9) {
+  if (t > 52.9 && photo) {
+    // Portretli variant: chapda ravoq ichida rasm, o‘ngda imzo ustuni.
+    const col: React.CSSProperties = {...base, left: 850, width: 730};
+    els.push(
+      <div key="sign" style={{...base, top: 0}}>
+        <Portrait t={t} photo={photo} />
+        <div style={{...col, top: 196, fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, fontSize: 56, lineHeight: '70px', ...fx(t, 53.2, 54.15, 99, 100)}}>
+          {TEXT.sign1}
+        </div>
+        <div style={{...col, top: 280, fontFamily: SANS, fontWeight: 500, fontSize: 37, lineHeight: '52px', letterSpacing: '0.05em', ...fx(t, 53.45, 54.4, 99, 100)}}>
+          {TEXT.sign2.replace(' maslahatchisi', '')}
+          <br />
+          {'maslahatchisi'}
+        </div>
+        <Divider y={410} t={t} a={53.65} c={99} d={100} cx={1215} />
+        <div style={{...col, top: 424, fontFamily: SERIF, fontWeight: 700, fontSize: 122, lineHeight: '128px', ...fx(t, 53.7, 54.65, 99, 100, 20, 12)}}>
+          <span style={{...goldText, padding: '0 14px'}}>Murodov</span>
+          <br />
+          <span style={{...goldText, padding: '0 14px'}}>Jasurbek</span>
+        </div>
+      </div>,
+    );
+  } else if (t > 52.9) {
     els.push(
       <div key="sign" style={{...base, top: 0}}>
         <div style={{...base, top: 214, fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, fontSize: 62, lineHeight: '76px', ...fx(t, 53.05, 54.0, 99, 100)}}>
@@ -292,22 +315,22 @@ export const Texts: React.FC<{t: number; cam: Cam}> = ({t, cam}) => {
 };
 
 /** Nozik oltin ajratgich: chiziq + romb. */
-const Divider: React.FC<{y: number; t: number; a: number; c: number; d: number; wide?: boolean}> = ({y, t, a, c, d, wide}) => {
+const Divider: React.FC<{y: number; t: number; a: number; c: number; d: number; wide?: boolean; cx?: number}> = ({y, t, a, c, d, wide, cx = 960}) => {
   const k = ramp(t, a, a + 0.9, easeOut);
   const o = ramp(t, c, d);
   const w = (wide ? 300 : 150) * k;
   return (
     <svg style={{position: 'absolute', left: 0, top: y - 10, opacity: clamp01(k * 1.4) * (1 - o)}} width={1920} height={20}>
       <defs>
-        <linearGradient id={`div-${y}`} x1={960 - w - 10} x2={960 + w + 10} y1={0} y2={0} gradientUnits="userSpaceOnUse">
+        <linearGradient id={`div-${y}-${cx}`} x1={cx - w - 10} x2={cx + w + 10} y1={0} y2={0} gradientUnits="userSpaceOnUse">
           <stop offset="0" stopColor="#e3c27f" stopOpacity={0} />
           <stop offset="0.5" stopColor="#f1d9a0" stopOpacity={1} />
           <stop offset="1" stopColor="#e3c27f" stopOpacity={0} />
         </linearGradient>
       </defs>
-      <line x1={960 - w - 10} x2={960 - 14} y1={10} y2={10} stroke={`url(#div-${y})`} strokeWidth={1.6} />
-      <line x1={960 + 14} x2={960 + w + 10} y1={10} y2={10} stroke={`url(#div-${y})`} strokeWidth={1.6} />
-      <polygon points="960,3 967,10 960,17 953,10" fill="#f1d9a0" transform={`rotate(${(1 - k) * 90} 960 10)`} />
+      <line x1={cx - w - 10} x2={cx - 14} y1={10} y2={10} stroke={`url(#div-${y}-${cx})`} strokeWidth={1.6} />
+      <line x1={cx + 14} x2={cx + w + 10} y1={10} y2={10} stroke={`url(#div-${y}-${cx})`} strokeWidth={1.6} />
+      <polygon points={`${cx},3 ${cx + 7},10 ${cx},17 ${cx - 7},10`} fill="#f1d9a0" transform={`rotate(${(1 - k) * 90} ${cx} 10)`} />
     </svg>
   );
 };
