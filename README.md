@@ -74,6 +74,16 @@ Oflayn muhitda Remotion brauzer yuklay olmasa: `REMOTION_BROWSER=/yo‘l/headles
 | 00:46–00:53 | Tantanali, sokin tabrik, oltin zarralar | Bayramingiz muborak, aziz ustozlar! |
 | 00:53–01:00 | Yakuniy imzo (6 s to‘liq ko‘rinadi), oxirgi soniyada musiqa pasayadi | Hurmat va ehtirom bilan, · Qo‘qon shahar 23-maktab maslahatchisi · **Murodov Jasurbek** |
 
+## Portret (yakuniy sahna)
+
+53-soniyadan ravoq (mehrob) shaklidagi oltin ramka chiziladi, ichida muallif rasmi paydo bo‘ladi,
+imzo o‘ng ustunga o‘tadi. Rasm faqat 2-qismga ta’sir qiladi.
+
+- Rasmni tayyorlash: `python3 scripts/prepare_photo.py asl_rasm.jpg` → `public/photo.jpg`
+  (bosh-yelka kesimi, oq studiya foni iliq fil suyagi rangiga almashtiriladi).
+- Yoqish/o‘chirish: `src/lib/photo.ts` → `PHOTO_FILE = 'photo.jpg'` yoki `null`.
+- So‘ng: `npm run render:2 && npm run concat && npm run verify`.
+
 ## Audio
 
 - **Musiqa**: shu loyiha uchun yozilgan original instrumental (pianino, torli cholg‘ular,

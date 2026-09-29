@@ -76,11 +76,11 @@ export const Portrait: React.FC<{t: number; photo: string}> = ({t, photo}) => {
         ) : (
           <Img
             src={staticFile(photo)}
-            style={{width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 22%', transform: `scale(${zoom})`}}
+            style={{width: '100%', height: '100%', objectFit: 'cover', transformOrigin: '50% 42%', transform: `scale(${zoom})`}}
           />
         )}
         {/* chetlari yumshoq qorong‘ilashadi — ramka bilan uyg‘unlashadi */}
-        <div style={{position: 'absolute', inset: 0, boxShadow: 'inset 0 0 60px 18px rgba(5,13,31,0.55)'}} />
+        <div style={{position: 'absolute', inset: 0, boxShadow: 'inset 0 0 46px 10px rgba(110,78,32,0.38), inset 0 0 8px 2px rgba(5,13,31,0.5)'}} />
       </div>
       <svg width={w + 40} height={h + 40} style={{position: 'absolute', left: -20, top: -20, overflow: 'visible'}}>
         <defs>
