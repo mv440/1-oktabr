@@ -6,8 +6,8 @@
   "scripts": {
     "studio": "remotion studio src/index.ts",
     "audio": "python3 audio/build_audio.py",
-    "render:1": "remotion render src/index.ts Ustozlar out/01_ustozlar_0-30.mp4 --frames=0-899",
-    "render:2": "remotion render src/index.ts Ustozlar out/02_ustozlar_30-60.mp4 --frames=900-1799",
+    "render:1": "remotion render src/index.ts Ustozlar out/01_ustozlar_0-30.mp4 --frames=0-899 && bash scripts/mux_audio.sh 1",
+    "render:2": "remotion render src/index.ts Ustozlar out/02_ustozlar_30-60.mp4 --frames=900-1799 && bash scripts/mux_audio.sh 2",
     "concat": "bash scripts/concat.sh",
     "build": "npm run audio && npm run render:1 && npm run render:2 && npm run concat && npm run verify",
     "verify": "python3 scripts/verify.py"

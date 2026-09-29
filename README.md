@@ -36,6 +36,7 @@ src/
   components/Texts.tsx  — barcha ekrandagi matnlar
 audio/build_audio.py    — original musiqa (MIDI → FluidSynth) + diktor ovozi uchun aralashtirish
 audio/voice/            — ovoz matni, vaqt belgilari (cues.json), ulash yo‘riqnomasi
+scripts/mux_audio.sh    — har bir qismga 60 s audio asosning aniq bo‘lagini joylash (video nusxalanadi)
 scripts/concat.sh       — ikki qismni qayta render qilmasdan birlashtirish
 scripts/verify.py       — format, kadrlar soni, 29–31 s ulanish (tasvir + audio) tekshiruvi
 scripts/stills.mjs      — alohida kadrlarni PNG sifatida chiqarish
@@ -50,8 +51,8 @@ Talablar: Node.js 18+, Python 3 (`pip install mido numpy soundfile pyloudnorm`),
 npm install
 npm run audio        # public/audio/mix.wav — 60 s audio asos
 npm run studio       # brauzerda ko‘rish/tahrirlash
-npm run render:1     # out/01_ustozlar_0-30.mp4   (--frames=0-899)
-npm run render:2     # out/02_ustozlar_30-60.mp4  (--frames=900-1799)
+npm run render:1     # out/01_ustozlar_0-30.mp4   (--frames=0-899, so‘ng audio: 0–30 s)
+npm run render:2     # out/02_ustozlar_30-60.mp4  (--frames=900-1799, so‘ng audio: 30–60 s)
 npm run concat       # out/03_ustozlar_toliq_60s.mp4
 npm run verify       # tekshiruv
 # yoki hammasi birga:
@@ -83,6 +84,17 @@ Oflayn muhitda Remotion brauzer yuklay olmasa: `REMOTION_BROWSER=/yo‘l/headles
   shuning uchun noto‘g‘ri talaffuzli ovoz qo‘shilmadi. Matn va vaqt belgilari:
   `audio/voice/ovoz_matni.md`, `audio/voice/cues.json`. Yozuvni qo‘yib `npm run build`
   qilinsa — ovoz musiqa ustiga avtomatik joylashadi (ducking bilan) va videolar qayta chiqadi.
+
+## Tekshiruv natijasi
+
+`out/tekshiruv.txt` — `npm run verify` natijasi: har bir qism 900 kadr / 30,000 s, 60 s fayl
+1800 kadr / 60,000 s, parametrlar bir xil; 29–31 s oralig‘ida qora kadr, takroriy kadr,
+tasvir sakrashi va audio uzilishi yo‘q; audio yagona asos bilan namunagacha mos.
+
+Texnik izoh: Remotion AAC oqimiga kodlovchi “priming”ini (2048 namuna) edit-list bilan
+belgilamaydi — natijada audio ~43 ms kechikadi va fayl 30,059 s bo‘lib qoladi. Shu sababli
+`scripts/mux_audio.sh` har bir qismning audiosini yagona `mix.wav` dan aniq namunalar
+bo‘yicha qayta joylaydi (video oqimi o‘zgarmaydi).
 
 ## Shriftlar
 

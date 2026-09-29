@@ -1,0 +1,35 @@
+out/01_ustozlar_0-30.mp4: h264 1920x1080 30/1 yuv420p | 900 kadr, video 30.000 s | audio aac 48000 Hz 2ch 192 kbps, 30.000 s
+  OK   1920x1080
+  OK   30 fps
+  OK   900 kadr
+  OK   davomiylik 30.000 s
+out/02_ustozlar_30-60.mp4: h264 1920x1080 30/1 yuv420p | 900 kadr, video 30.000 s | audio aac 48000 Hz 2ch 192 kbps, 30.000 s
+  OK   1920x1080
+  OK   30 fps
+  OK   900 kadr
+  OK   davomiylik 30.000 s
+out/03_ustozlar_toliq_60s.mp4: h264 1920x1080 30/1 yuv420p | 1800 kadr, video 60.000 s | audio aac 48000 Hz 2ch 192 kbps, 60.000 s
+  OK   1920x1080
+  OK   30 fps
+  OK   1800 kadr
+  OK   davomiylik 60.000 s
+  OK   ikkala qismning video/audio parametrlari bir xil
+
+29–31 s ulanishi (tasvir):
+  OK   29–30 s: 30 kadr, 30–31 s: 30 kadr
+  o'rtacha yorqinlik: 69.7 69.6 69.5 69.4 69.2 69.1 69.0 68.9 68.6 68.6 68.4 68.3 68.1 68.0 67.8 67.7 67.5 67.4 67.2 67.1 66.9 66.8 66.6 66.4 66.2 66.1 65.9 65.8 65.5 65.4 65.2 65.1 64.9 64.8 64.5 64.5 64.3 64.1 63.9 63.8 63.6 63.5 63.3 63.2 63.0 62.9 62.7 62.6 62.5 62.3 62.1 62.1 61.9 61.8 61.6 61.6 61.5 61.4 61.2 61.2
+  ketma-ket kadr farqi: 0.96 0.94 0.93 0.95 0.97 0.95 0.94 0.96 0.97 0.93 0.95 0.96 0.97 0.94 0.95 0.95 0.95 0.92 0.93 0.94 0.95 0.93 0.92 0.95 0.95 0.93 0.92 0.95 0.89 1.06 0.91 0.89 0.89 0.88 0.91 0.88 0.87 0.89 0.90 0.87 0.86 0.88 0.88 0.85 0.84 0.85 0.85 0.82 0.81 0.83 0.83 0.80 0.79 0.79 0.78 0.76 0.76 0.76 0.77
+  OK   qora kadr yo'q (eng past yorqinlik 61.2)
+  OK   takroriy kadr yo'q (eng kichik farq 0.756)
+  OK   sakrash yo'q: chegaradagi farq 1.06, qo'shnilar medianasi 0.91
+  OK   60 s fayldagi 29–31 s kadrlar qismlar bilan bir xil
+
+29–31 s ulanishi (audio):
+  OK   audio: 30.016 s + 30.016 s (dekoder oxiridagi to'ldirish bilan)
+  OK   audio videoga aniq mos (siljish: 1-qism 0, 2-qism 0 namuna)
+  OK   qismlar audiosi yagona 60 s asos bilan mos (29–31 s korrelyatsiya 0.9984, maks. farq 0.218)
+  29.8–30.2 s RMS (10 ms): -19 -20 -19 -20 -20 -19 -20 -19 -19 -20 -19 -20 -20 -19 -21 -20 -20 -22 -19 -20 -20 -17 -17 -19 -18 -20 -18 -19 -19 -19 -16 -17 -17 -19 -17 -19 -19 -19 -18 -19
+  OK   30-soniyada audio uzilishi / sukunat yo'q
+  OK   60 s fayl audiosi uzluksiz (29–31 s korrelyatsiya 0.9979)
+
+NATIJA: HAMMASI TO'G'RI

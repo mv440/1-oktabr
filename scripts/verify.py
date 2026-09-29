@@ -88,7 +88,17 @@ if FULL in params:
 print("\n29–31 s ulanishi (audio):")
 m, sr = sf.read(MASTER, dtype="float32")
 a1, a2 = audio(P1), audio(P2)
-check(abs(len(a1) / 48000 - 30) < 0.03 and abs(len(a2) / 48000 - 30) < 0.03, f"audio: {len(a1) / 48000:.3f} s + {len(a2) / 48000:.3f} s")
+check(len(a1) >= 1440000 and len(a2) >= 1440000, f"audio: {len(a1) / 48000:.3f} s + {len(a2) / 48000:.3f} s (dekoder oxiridagi to'ldirish bilan)")
+
+
+def lag_of(x, ref, start):
+    seg = ref[start:start + 48000 * 3, 0]
+    return max((float(np.dot(x[start + l:start + l + len(seg), 0], seg)), l) for l in range(-2500, 2501, 1))[1]
+
+
+l1, l2 = lag_of(a1, m[:1440000], 48000), lag_of(a2, m[1440000:], 48000)
+check(l1 == 0 and l2 == 0, f"audio videoga aniq mos (siljish: 1-qism {l1}, 2-qism {l2} namuna)")
+a1, a2 = a1[:1440000], a2[:1440000]
 joined = np.concatenate([a1, a2])
 n = min(len(joined), len(m))
 seg = slice(int(29 * 48000), int(31 * 48000))
