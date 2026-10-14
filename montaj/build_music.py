@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""Montaj uchun original fon musiqasi (G-major, 104 BPM, 10 takt + yakuniy akkord).
-Kesishlar taktlarga mos: 4-, 6- va 9-takt boshida. MIDI -> FluidSynth -> FluidR3_GM (MIT)."""
+"""Montaj uchun original fon musiqasi va ovoz effektlari (v2).
+- 0..HOOK s: sovuq ochilish — ko'tariluvchi "riser" (shovqin + sinus), oxirida zarba (impact).
+- HOOK s dan: G-major, 104 BPM, 10 takt + yakuniy akkord. Har 2 taktda kesish.
+- O'tishlarda yumshoq "whoosh". MIDI -> FluidSynth -> FluidR3_GM (MIT); effektlar numpy'da sintezlanadi."""
 import os, random, subprocess, sys
 import mido, numpy as np, soundfile as sf, pyloudnorm as pyln
 
@@ -8,8 +10,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SR, BPM, TPB = 48000, 104, 480
 BEAT = 60 / BPM
 BAR = 4 * BEAT
-TAIL = 1.2
-TOTAL = 10 * BAR + TAIL
+TAIL = 1.6
+HOOK = 2.0
+MUSIC = 10 * BAR + TAIL
+TOTAL = HOOK + MUSIC
+WHOOSH_AT = [HOOK + 2 * BAR, HOOK + 4 * BAR, HOOK + 6 * BAR, HOOK + 8 * BAR, HOOK + 10 * BAR]
 NOTE = {"C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4, "F": 5, "F#": 6, "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11}
 n = lambda s: 12 * (int(s[-1]) + 1) + NOTE[s[:-1]]
 
@@ -30,7 +35,7 @@ MEL = [(5, 0, "B5", 1), (5, 1, "D6", 1), (5, 2, "B5", .5), (5, 2.5, "A5", .5), (
 
 
 def dyn(t):
-    pts = [(0, .5), (BAR * 2, .6), (BAR * 4, .7), (BAR * 8, .82), (BAR * 9, .9), (TOTAL, .8)]
+    pts = [(0, .62), (BAR * 2, .7), (BAR * 4, .76), (BAR * 8, .86), (BAR * 9, .95), (MUSIC, .85)]
     for (a, va), (b, vb) in zip(pts, pts[1:]):
         if a <= t <= b:
             return va + (vb - va) * (t - a) / (b - a)
@@ -46,10 +51,10 @@ def main():
         bass, arp, pad = CH[name]; t0 = b * BAR; d = dyn(t0)
         for k, idx in enumerate([0, 1, 2, 3, 4, 3, 2, 1]):  # pianino 8-liklar
             note(t0 + k * BEAT / 2 + rnd.uniform(-.004, .004), 0, n(arp[idx]), BEAT * .9, (42 + 34 * d) * (1 if k % 2 == 0 else .82))
-        if b >= 1:  # pizzicato
+        if b >= 0:  # pizzicato
             for k in range(4):
                 note(t0 + k * BEAT, 1, n(pad[(k + 1) % 4]) + 12, .25, 48 + 30 * d)
-        if b >= 2:
+        if b >= 0:  # zarbadan boshlab to'liq ritm
             for p in pad:
                 note(t0 + .01, 2, n(p), BAR + .05, 46 + 30 * d)  # torli fon
             note(t0, 3, n(bass), BEAT * 1.8, 70 + 30 * d); note(t0 + 2 * BEAT, 3, n(bass), BEAT * 1.8, 64 + 30 * d)
@@ -57,15 +62,15 @@ def main():
                 note(t0 + k * BEAT / 2, 9, 82, .1, (40 if k % 2 else 55) + 20 * d)
             for k in (0, 2):
                 note(t0 + k * BEAT, 9, 36, .2, 70 + 25 * d)
-        if b >= 4:
+        if b >= 2:
             for k in (1, 3):
                 note(t0 + k * BEAT, 9, 39, .2, 52 + 25 * d)  # qarsak
-        if b in (4, 8):
-            note(t0, 9, 49, 1.5, 48 + 20 * d)
+        if b in (0, 4, 8):
+            note(t0, 9, 49, 1.5, 52 + 20 * d)
     for bar, beat, p, dur in MEL:
         t = ((bar - 1) * 4 + beat) * BEAT
         note(t, 4, n(p), dur * BEAT * 1.1, 58 + 34 * dyn(t))
-    tf = 10 * BAR  # yakuniy G akkord
+    tf = 10 * BAR  # (musiqa ichidagi vaqt)  # yakuniy G akkord
     for j, p in enumerate(["G2", "G3", "D4", "G4", "B4", "D5", "G5"]):
         note(tf + j * .03, 0, n(p), 2.5, 70)
     for p in ["G5", "G6"]:
@@ -89,14 +94,38 @@ def main():
     mp = os.path.join(HERE, "music.mid"); raw = os.path.join(HERE, "music_raw.wav"); mid.save(mp)
     subprocess.run(["fluidsynth", "-ni", "-q", "-g", "0.5", "-r", str(SR), "-o", "synth.reverb.room-size=0.6",
                     "-o", "synth.reverb.level=0.6", "-F", raw, "/usr/share/sounds/sf2/FluidR3_GM.sf2", mp], check=True)
-    x, _ = sf.read(raw, always_2d=True); os.remove(raw)
-    N = int(round(TOTAL * SR)); x = np.vstack([x, np.zeros((max(0, N - len(x)), 2))])[:N]
-    m = pyln.Meter(SR); x = pyln.normalize.loudness(x, m.integrated_loudness(x), -14.0)
-    t = np.arange(N) / SR
-    x *= (np.clip(t / .02, 0, 1) * (0.5 + 0.5 * np.cos(np.pi * np.clip((t - (TOTAL - 1.0)) / 1.0, 0, 1))))[:, None]
+    mus, _ = sf.read(raw, always_2d=True); os.remove(raw)
+    M = int(round(MUSIC * SR)); mus = np.vstack([mus, np.zeros((max(0, M - len(mus)), 2))])[:M]
+    meter = pyln.Meter(SR); mus = pyln.normalize.loudness(mus, meter.integrated_loudness(mus), -15.0)
+    N = int(round(TOTAL * SR)); h = int(round(HOOK * SR)); t = np.arange(N) / SR
+    x = np.zeros((N, 2)); x[h:h + M] = mus
+    rng = np.random.default_rng(3)
+    # riser: kuchayib boruvchi, chastotasi ko'tariluvchi shovqin + sinus
+    r = np.arange(h) / SR; k = r / HOOK
+    noise = rng.standard_normal(h)
+    from scipy.signal import butter, sosfilt
+    lo = sosfilt(butter(2, 400, 'hp', fs=SR, output='sos'), noise)
+    riser = lo * (k ** 2.2) * 0.10
+    ph = 2 * np.pi * np.cumsum(220 * 2 ** (2.5 * k)) / SR
+    riser += np.sin(ph) * (k ** 3) * 0.05
+    x[:h] += riser[:, None]
+    # impact: past chastotali zarba + shovqin portlashi
+    L = int(1.2 * SR); u = np.arange(L) / SR
+    boom = np.sin(2 * np.pi * (55 * u + 40 * (1 - np.exp(-u * 18)) / 18)) * np.exp(-u * 4.5) * 0.45
+    burst = sosfilt(butter(2, 1500, 'hp', fs=SR, output='sos'), rng.standard_normal(L)) * np.exp(-u * 9) * 0.12
+    x[h:h + L] += (boom + burst)[:, None]
+    # whoosh'lar o'tishlarda (markazi takt chegarasida)
+    for c in WHOOSH_AT:
+        L = int(0.6 * SR); u = np.arange(L) / L
+        env = np.sin(np.pi * u) ** 2
+        wn = sosfilt(butter(2, [600, 5000], 'bp', fs=SR, output='sos'), rng.standard_normal(L)) * env * 0.07
+        s0 = int((c - 0.3) * SR); pan = np.stack([1 - .4 * u, .6 + .4 * u], 1)
+        x[s0:s0 + L] += wn[:, None] * pan
+    x *= (np.clip(t / .02, 0, 1) * (0.5 + 0.5 * np.cos(np.pi * np.clip((t - (TOTAL - 1.2)) / 1.2, 0, 1))))[:, None]
+    x = pyln.normalize.loudness(x, meter.integrated_loudness(x), -14.0)
     if np.abs(x).max() > .89: x *= .89 / np.abs(x).max()
     sf.write(os.path.join(HERE, "music.wav"), x.astype(np.float32), SR, subtype="PCM_24")
-    print(f"music.wav {TOTAL:.3f}s, bar={BAR:.4f}s")
+    print(f"music.wav {TOTAL:.3f}s (hook {HOOK}s), bar={BAR:.4f}s")
 
 
 if __name__ == "__main__":
