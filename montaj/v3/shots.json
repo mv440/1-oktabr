@@ -1,0 +1,62 @@
+{
+ "p1": {
+  "frames": 60,
+  "handle": 0,
+  "visible": 60
+ },
+ "p2": {
+  "frames": 60,
+  "handle": 0,
+  "visible": 60
+ },
+ "p3": {
+  "frames": 60,
+  "handle": 0,
+  "visible": 60
+ },
+ "s1": {
+  "frames": 78,
+  "handle": 9,
+  "visible": 60
+ },
+ "s2": {
+  "frames": 138,
+  "handle": 9,
+  "visible": 120
+ },
+ "s3": {
+  "frames": 78,
+  "handle": 9,
+  "visible": 60
+ },
+ "s4": {
+  "frames": 78,
+  "handle": 9,
+  "visible": 60
+ },
+ "s5": {
+  "frames": 108,
+  "handle": 9,
+  "visible": 90
+ },
+ "s6": {
+  "frames": 138,
+  "handle": 9,
+  "visible": 120
+ },
+ "s7": {
+  "frames": 78,
+  "handle": 9,
+  "visible": 60
+ },
+ "s8": {
+  "frames": 138,
+  "handle": 9,
+  "visible": 120
+ },
+ "s9": {
+  "frames": 114,
+  "handle": 9,
+  "visible": 96
+ }
+}

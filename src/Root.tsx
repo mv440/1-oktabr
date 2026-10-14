@@ -1,6 +1,7 @@
 import React from 'react';
 import {Composition} from 'remotion';
 import {Main} from './Main';
+import {Montaj, MONTAJ_FRAMES} from './montaj/Montaj';
 import {PHOTO_FILE} from './lib/photo';
 import {FPS, HEIGHT, TOTAL_FRAMES, WIDTH} from './lib/timeline';
 
@@ -15,4 +16,11 @@ export const Root: React.FC = () => (
     height={HEIGHT}
     defaultProps={{photo: PHOTO_FILE}}
   />
+);
+
+export const RootAll: React.FC = () => (
+  <>
+    <Root />
+    <Composition id="Montaj" component={Montaj} durationInFrames={MONTAJ_FRAMES} fps={30} width={1080} height={1920} />
+  </>
 );
