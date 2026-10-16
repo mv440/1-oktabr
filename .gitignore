@@ -10,3 +10,6 @@ montaj/src/
 montaj/work/
 __pycache__/
 public/montaj/
+montaj/olimpiada/src/
+montaj/olimpiada/work/
+montaj/olimpiada/work_music_raw.wav
