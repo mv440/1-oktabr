@@ -157,6 +157,14 @@ body { background: var(--wall); color: var(--ink); font-family: var(--body); ove
 .say { display: flex; gap: 8px; }
 .say input { flex: 1; min-width: 0; border: 2px solid #ecd6b4; border-radius: 14px; padding: 10px 12px; font: 600 1rem var(--body); color: var(--ink); background: #fff; }
 .say button { appearance: none; border: 0; border-radius: 14px; background: var(--atlas-1); color: #fff; font: 800 .95rem var(--body); padding: 0 18px; cursor: pointer; }
+.rec-row { display: flex; gap: 8px; margin-top: 8px; }
+.rec-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 14px; padding: 10px 12px;
+  background: #f6e7cf; box-shadow: 0 3px 0 #e2caa6; font: 800 .9rem var(--body); color: var(--ink); cursor: pointer; }
+.rec-btn svg { width: 20px; height: 20px; }
+.rec-btn:focus-within { outline: 3px solid var(--atlas-3); outline-offset: 2px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.meter { display: block; width: 46px; height: 6px; border-radius: 99px; background: rgba(255,255,255,.35); overflow: hidden; }
+.meter s { display: block; height: 100%; width: 0; background: #fff; border-radius: inherit; transition: width .08s; }
 .note { font-size: .78rem; color: var(--ink-soft); margin: 6px 2px 0; line-height: 1.35; }
 .start { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; background: rgba(13,40,44,.72);
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
@@ -261,7 +269,7 @@ body { background: var(--wall); color: var(--ink); font-family: var(--body); ove
     <div class="night"></div>
     <div class="bubble" id="bubble"></div>
     <div class="fx" id="fx"></div>
-    <div class="mic-badge" id="micBadge" hidden><i></i>Tinglayapti — gapiring</div>
+    <div class="mic-badge" id="micBadge" hidden><i></i>Tinglayapti — gapiring<b class="meter" aria-hidden="true"><s id="micLvl"></s></b></div>
     <div class="hint" id="hint">Boshini silang, burnini, qornini yoki dumini bosing</div>
   </main>
 
@@ -274,6 +282,9 @@ body { background: var(--wall); color: var(--ink); font-family: var(--body); ove
         <input id="sayInput" type="text" maxlength="120" placeholder="Biror gap yozing, Mosh takrorlaydi" autocomplete="off">
         <button type="submit">Ayt</button>
       </form>
+      <div class="rec-row">
+        <label class="rec-btn" for="recFile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5" fill="currentColor"/></svg>Ovoz yozib yuborish<input class="vh" id="recFile" type="file" accept="audio/*" capture="user"></label>
+      </div>
       <p class="note" id="talkNote">Mosh yozganingizni ingichka ovozda takrorlaydi.</p>
     </div>
     <div class="actions">
@@ -636,21 +647,26 @@ body { background: var(--wall); color: var(--ink); font-family: var(--body); ove
   // ---------- gapirish: mikrofon (mavjud bo'lsa) yoki matn ----------
   let micOn = false, stream = null, proc = null, srcNode = null, playing = false;
   async function startMic() {
-    if (!audio() || !navigator.mediaDevices?.getUserMedia) return false;
-    try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
-    catch (e) { return false; }
+    if (!audio()) return 'noaudio';
+    if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) return 'insecure';
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
+    catch (e) { return e && e.name === 'NotFoundError' ? 'nodevice' : e && e.name === 'NotReadableError' ? 'busy' : 'denied'; }
+    if (ac.state === 'suspended') { try { await ac.resume(); } catch (e) {} }
     srcNode = ac.createMediaStreamSource(stream);
     proc = ac.createScriptProcessor(2048, 1, 1);
     const mute = ac.createGain(); mute.gain.value = 0;
     srcNode.connect(proc); proc.connect(mute); mute.connect(ac.destination);
-    const TH = .028, pre = [], chunkDur = 2048 / ac.sampleRate;
-    let rec = false, chunks = [], silence = 0, total = 0;
+    const pre = [], chunkDur = 2048 / ac.sampleRate;
+    let rec = false, chunks = [], silence = 0, total = 0, floor = .006, TH = .02;
     proc.onaudioprocess = ev => {
       if (playing) { rec = false; return; }
       const d = new Float32Array(ev.inputBuffer.getChannelData(0));
       let s = 0; for (let i = 0; i < d.length; i++) s += d[i] * d[i];
       const rms = Math.sqrt(s / d.length);
+      $('micLvl').style.width = Math.min(100, rms * 900) + '%';
       if (!rec) {
+        floor = floor * .97 + Math.min(rms, .05) * .03;      // shovqin darajasini kuzatish
+        TH = Math.max(.012, Math.min(.05, floor * 3));
         pre.push(d); if (pre.length > 6) pre.shift();
         if (rms > TH) { rec = true; chunks = pre.splice(0); silence = 0; total = 0; app.classList.add('listening'); }
         return;
@@ -662,7 +678,7 @@ body { background: var(--wall); color: var(--ink); font-family: var(--body); ove
         if (total - silence > .25) playBack(chunks);
       }
     };
-    return true;
+    return 'ok';
   }
   function playBack(chunks) {
     const len = chunks.reduce((a, c) => a + c.length, 0), buf = ac.createBuffer(1, len, ac.sampleRate), out = buf.getChannelData(0);
@@ -686,13 +702,35 @@ body { background: var(--wall); color: var(--ink); font-family: var(--body); ove
     if (!$('talkPanel').hidden) { closePanels(); return; }
     closePanels();
     $('btnTalk').setAttribute('aria-pressed', 'true');
-    const ok = await startMic();
-    if (ok) { micOn = true; $('micBadge').hidden = false; say('Gapiring, takrorlayman!', 1600); }
-    else {
-      $('talkPanel').hidden = false;
-      $('talkNote').textContent = 'Bu yerda mikrofon ishlamadi, shuning uchun yozing: Mosh yozganingizni ingichka ovozda takrorlaydi.';
-      $('sayInput').focus();
-    }
+    const res = await startMic();
+    if (res === 'ok') { micOn = true; $('micBadge').hidden = false; say('Gapiring, takrorlayman!', 1600); return; }
+    const MSG = {
+      insecure: 'Jonli mikrofon bu oynada ishlamaydi. Ovoz yozib yuboring yoki gap yozing. Jonli mikrofon uchun faylni Chrome yoki Safari’da oching.',
+      denied: 'Mikrofonga ruxsat berilmadi. Brauzer manzil qatoridagi qulf belgisidan mikrofonni yoqing yoki ovoz yozib yuboring.',
+      nodevice: 'Mikrofon topilmadi. Ovoz yozib yuboring yoki gap yozing.',
+      busy: 'Mikrofonni boshqa ilova band qilgan. Uni yoping yoki ovoz yozib yuboring.',
+      noaudio: 'Bu brauzer ovozni qo‘llab-quvvatlamaydi.'
+    };
+    $('talkPanel').hidden = false;
+    $('talkNote').textContent = MSG[res] || MSG.insecure;
+  });
+
+  $('recFile').addEventListener('change', async e => {
+    const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+    if (!audio() || wakeIfAsleep()) return;
+    try {
+      const ab = await f.arrayBuffer();
+      const buf = await new Promise((res, rej) => { const p = ac.decodeAudioData(ab, res, rej); if (p && p.catch) p.catch(rej); });
+      const d = buf.getChannelData(0), win = 1024;
+      let a = 0, b = d.length, peak = 0;
+      for (let i = 0; i < d.length; i++) peak = Math.max(peak, Math.abs(d[i]));
+      const th = peak * .08;                      // boshidagi va oxiridagi jimlikni kesish
+      while (a < b - win && Math.max(...d.subarray(a, a + win).map(Math.abs)) < th) a += win;
+      while (b > a + win && Math.max(...d.subarray(b - win, b).map(Math.abs)) < th) b -= win;
+      const clip = d.slice(a, Math.min(b, a + ac.sampleRate * 15));
+      if (clip.length < ac.sampleRate * .2) { say('Ovoz eshitilmadi', 1400); return; }
+      closePanels(); say('Eshiting!', 900); playBack([clip]);
+    } catch (err) { say('Bu yozuvni o‘qib bo‘lmadi', 1600); }
   });
 
   let voices = [];
