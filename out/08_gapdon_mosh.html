@@ -283,7 +283,7 @@ body { background: var(--wall); color: var(--ink); font-family: var(--body); ove
         <button type="submit">Ayt</button>
       </form>
       <div class="rec-row">
-        <label class="rec-btn" for="recFile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5" fill="currentColor"/></svg>Ovoz yozib yuborish<input class="vh" id="recFile" type="file" accept="audio/*" capture="user"></label>
+        <label class="rec-btn" for="recFile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5" fill="currentColor"/></svg>Ovoz yozuvini tanlash<input class="vh" id="recFile" type="file" accept="audio/*,.m4a,.mp3,.ogg,.opus,.wav,.aac,.amr,.3gp"></label>
       </div>
       <p class="note" id="talkNote">Mosh yozganingizni ingichka ovozda takrorlaydi.</p>
     </div>
@@ -705,10 +705,10 @@ body { background: var(--wall); color: var(--ink); font-family: var(--body); ove
     const res = await startMic();
     if (res === 'ok') { micOn = true; $('micBadge').hidden = false; say('Gapiring, takrorlayman!', 1600); return; }
     const MSG = {
-      insecure: 'Jonli mikrofon bu oynada ishlamaydi. Ovoz yozib yuboring yoki gap yozing. Jonli mikrofon uchun faylni Chrome yoki Safari’da oching.',
-      denied: 'Mikrofonga ruxsat berilmadi. Brauzer manzil qatoridagi qulf belgisidan mikrofonni yoqing yoki ovoz yozib yuboring.',
-      nodevice: 'Mikrofon topilmadi. Ovoz yozib yuboring yoki gap yozing.',
-      busy: 'Mikrofonni boshqa ilova band qilgan. Uni yoping yoki ovoz yozib yuboring.',
+      insecure: 'Jonli mikrofon bu oynada ishlamaydi. Ovoz yozuvini tanlang yoki gap yozing. Jonli mikrofon uchun o‘yinni mv440.github.io/1-oktabr havolasida oching.',
+      denied: 'Mikrofonga ruxsat berilmadi. Brauzer manzil qatoridagi qulf belgisidan mikrofonni yoqing yoki ovoz yozuvini tanlang.',
+      nodevice: 'Mikrofon topilmadi. Ovoz yozuvini tanlang yoki gap yozing.',
+      busy: 'Mikrofonni boshqa ilova band qilgan. Uni yoping yoki ovoz yozuvini tanlang.',
       noaudio: 'Bu brauzer ovozni qo‘llab-quvvatlamaydi.'
     };
     $('talkPanel').hidden = false;
